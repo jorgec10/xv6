@@ -89,3 +89,14 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int sys_date(void){
+
+  struct rtcdate* d;
+  if(argptr(0, (void*)&d, sizeof(*d)))
+    return -1;
+  acquire(&tickslock);
+  cmostime(d);
+  release(&tickslock);
+  return 0;
+}
