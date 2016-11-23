@@ -11,9 +11,13 @@ int main(int argc, char *argv[]){
 	}
 
 	//Imprimir Fecha
-
-	printf(1, "Date: %d/%d/%d\nTime: %d:%d:%d\n",
+	if (r.second < 10)
+		printf(1, "Date: %d/%d/%d\nTime: %d:%d:0%d\n",
 			r.day, r.month, r.year, r.hour, r.minute, r.second);
+	else
+		printf(1, "Date: %d/%d/%d\nTime: %d:%d:%d\n",
+			r.day, r.month, r.year, r.hour, r.minute, r.second);
+	
 
 	exit();
 }
