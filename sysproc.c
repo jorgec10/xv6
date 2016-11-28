@@ -93,10 +93,8 @@ sys_uptime(void)
 int sys_date(void){
 
   struct rtcdate* d;
-  if(argptr(0, (void*)&d, sizeof(*d)))
+  if(argptr(0, (char**)&d, sizeof(*d)) < 0)
     return -1;
-  acquire(&tickslock);
   cmostime(d);
-  release(&tickslock);
   return 0;
 }

@@ -66,6 +66,25 @@ sys_dup(void)
 }
 
 int
+sys_dup2(void)
+{ 
+  struct file *f;
+  struct file *newf;
+  int fd;
+  int newfd;
+
+  if(argfd(0, 0, &f) < 0)
+    return -1;
+  if(argint(1,&newfd) < 0)
+    return -1;
+  if((newf = proc->ofile[newfd]) != 0)
+    fileclose(newf);
+  proc->ofile[newfd] = f;
+  filedup(f);
+  return newfd;
+}
+
+int
 sys_read(void)
 {
   struct file *f;
