@@ -249,6 +249,31 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
+// Añadimos aqui
+int pfallocuvm(pde_t* pgdir, uint va){
+  void * mem;
+  uint a;
+
+  a = PGROUNDDOWN(proc->sz);
+  for(; a < va - *pgdir; a += PGSIZE){
+    mem = kalloc();
+    if(mem == 0){
+      cprintf("pfallocuvm out of memory\n");
+      deallocuvm(pgdir, va - *pgdir, proc->sz);
+      return 0;
+    }
+    memset(mem, 0, PGSIZE);
+    if(mappages(pgdir, (char*)va, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
+      cprintf("pfallocuvm out of memory (2)\n");
+      deallocuvm(pgdir, va - *pgdir, proc->sz);
+      kfree(mem);
+      return 0;
+    }
+  }
+
+  return -1;
+}
+
 // Deallocate user pages to bring the process size from oldsz to
 // newsz.  oldsz and newsz need not be page-aligned, nor does newsz
 // need to be less than oldsz.  oldsz can be larger than the actual
@@ -279,13 +304,6 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
-// Añadimos aqui
-int pfallocuvm(pde_t* pgdir, uint va){
-  void * mem = kalloc();
-  uint pa = V2P(mem);
-  pa += 2;
-  return -1;
-}
 
 
 // Free a page table and all the physical memory pages
