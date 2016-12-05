@@ -78,6 +78,18 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
 
+  // Añadimos
+  case T_PGFLT:
+    // In user space, assume process misbehaved.
+    cprintf("pid %d %s: trap %d err %d on cpu %d "
+            "eip 0x%x addr 0x%x--serve pagefault\n",
+            proc->pid, proc->name, tf->trapno, tf->err, cpunum(), tf->eip,
+            rcr2());
+    // Llamada a la funcion que trata el fallo
+    if (pfallocuvm(proc->pgdir, rcr2()) < 0)
+      proc->killed = 1;
+    break;
+    
   //PAGEBREAK: 13
   default:
     if(proc == 0 || (tf->cs&3) == 0){

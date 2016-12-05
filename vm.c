@@ -279,6 +279,15 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
+// Añadimos aqui
+int pfallocuvm(pde_t* pgdir, uint va){
+  void * mem = kalloc();
+  uint pa = V2P(mem);
+  pa += 2;
+  return -1;
+}
+
+
 // Free a page table and all the physical memory pages
 // in the user part.
 void
