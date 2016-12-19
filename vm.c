@@ -251,27 +251,13 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 
 // Añadimos aqui
 int pfallocuvm(pde_t* pgdir, uint va){
-  void * mem;
-  uint a;
-
-  a = PGROUNDDOWN(proc->sz);
-  for(; a < va - *pgdir; a += PGSIZE){
-    mem = kalloc();
-    if(mem == 0){
-      cprintf("pfallocuvm out of memory\n");
-      deallocuvm(pgdir, va - *pgdir, proc->sz);
-      return 0;
-    }
-    memset(mem, 0, PGSIZE);
-    if(mappages(pgdir, (char*)va, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
-      cprintf("pfallocuvm out of memory (2)\n");
-      deallocuvm(pgdir, va - *pgdir, proc->sz);
-      kfree(mem);
-      return 0;
-    }
-  }
-
-  return -1;
+  void * mem = kalloc();
+  if (mem < 0)
+    return -1;
+  uint a = PGROUNDDOWN(va);
+  uint pa = V2P(mem);
+  memset(mem, 0, PGSIZE);
+  return mappages(pgdir, (char*)a, PGSIZE, pa, PTE_W|PTE_U);
 }
 
 // Deallocate user pages to bring the process size from oldsz to
@@ -353,8 +339,8 @@ copyuvm(pde_t *pgdir, uint sz)
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
-    if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
+    /*if(!(*pte & PTE_P))
+      panic("copyuvm: page not present");*/
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)

@@ -52,9 +52,12 @@ sys_sbrk(void)
     return -1;
   addr = proc->sz;
   // Añadimos a partir de aqui
-  //if(growproc(n) < 0)
-  //  return -1;
-  proc->sz += n;
+  if(n<0){
+    if (growproc(n) < 0)
+      return -1;
+  }
+  else
+    proc->sz += n;
   return addr;
 }
 
