@@ -85,8 +85,9 @@ trap(struct trapframe *tf)
             "eip 0x%x addr 0x%x--serve pagefault\n",
             proc->pid, proc->name, tf->trapno, tf->err, cpunum(), tf->eip,
             rcr2());
+    uint r = rcr2();
     // Llamada a la funcion que trata el fallo, en vm.c
-    if (pfallocuvm(proc->pgdir, rcr2()) < 0)
+    if ( (r < tf->esp) || (pfallocuvm(proc->pgdir, r) < 0))
       proc->killed = 1;
     break;
     
