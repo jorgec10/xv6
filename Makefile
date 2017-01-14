@@ -177,6 +177,8 @@ UPROGS=\
 	_dup2test\
 	_dup2test2\
 	_sbrktest\
+	_tsbrk1\
+	_tsbrk2\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
